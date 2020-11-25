@@ -16,11 +16,14 @@ type BlockCache struct {
 	upstream blockstore.Blockstore
 }
 
-func NewBlockCache(bs *Blockstore, upstream blockstore.Blockstore) *BlockCache {
+func NewBlockCache(bs *Blockstore) *BlockCache {
 	return &BlockCache{
-		store:    bs,
-		upstream: upstream,
+		store: bs,
 	}
+}
+
+func (bc *BlockCache) SetUpstream(upstream blockstore.Blockstore) {
+	bc.upstream = upstream
 }
 
 func (bc *BlockCache) Has(c cid.Cid) (bool, error) {
@@ -38,7 +41,7 @@ func (bc *BlockCache) Has(c cid.Cid) (bool, error) {
 
 func (bc *BlockCache) Get(c cid.Cid) (blocks.Block, error) {
 	data, err := bc.store.Get(c)
-	if err != nil {
+	if err == nil {
 		return data, nil
 	}
 	return bc.fillFromUpstream(c)
@@ -46,7 +49,7 @@ func (bc *BlockCache) Get(c cid.Cid) (blocks.Block, error) {
 
 func (bc *BlockCache) GetSize(c cid.Cid) (int, error) {
 	size, err := bc.store.GetSize(c)
-	if err != nil {
+	if err == nil {
 		return size, nil
 	}
 	blk, err := bc.fillFromUpstream(c)
@@ -98,4 +101,8 @@ func (bc *BlockCache) AllKeysChan(ctx context.Context) (<-chan cid.Cid, error) {
 
 func (bc *BlockCache) HashOnRead(_ bool) {
 	// ignore
+}
+
+func (bc *BlockCache) Close() error {
+	return bc.store.Close()
 }

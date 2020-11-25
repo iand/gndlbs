@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/iand/gonudb"
 	blocks "github.com/ipfs/go-block-format"
@@ -28,10 +29,10 @@ type Blockstore struct {
 
 var _ blockstore.Blockstore = (*Blockstore)(nil)
 
-func Open(base string, opts *gonudb.StoreOptions) (*Blockstore, error) {
-	datPath := base + ".dat"
-	keyPath := base + ".key"
-	logPath := base + ".log"
+func Open(directory string, name string, opts *gonudb.StoreOptions) (*Blockstore, error) {
+	datPath := filepath.Join(directory, name+".dat")
+	keyPath := filepath.Join(directory, name+".key")
+	logPath := filepath.Join(directory, name+".log")
 
 	err := gonudb.CreateStore(datPath, keyPath, logPath, 1, gonudb.NewSalt(), BlockSize, LoadFactor)
 	if err != nil {
@@ -129,8 +130,4 @@ func (b *Blockstore) AllKeysChan(ctx context.Context) (<-chan cid.Cid, error) {
 
 func (b *Blockstore) HashOnRead(_ bool) {
 	// ignore
-}
-
-func (d *Blockstore) Wrap(u blockstore.Blockstore) blockstore.Blockstore {
-	return NewBlockCache(d, u)
 }
