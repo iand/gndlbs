@@ -86,7 +86,7 @@ func (b *Blockstore) Get(cid cid.Cid) (blocks.Block, error) {
 func (b *Blockstore) GetSize(cid cid.Cid) (int, error) {
 	size, err := b.store.DataSize(string(cid.Hash()))
 	if errors.Is(err, gonudb.ErrKeyNotFound) {
-		return 0, blockstore.ErrNotFound
+		return -1, blockstore.ErrNotFound
 	}
 	return int(size), err
 }
@@ -116,8 +116,10 @@ func (b *Blockstore) AllKeysChan(ctx context.Context) (<-chan cid.Cid, error) {
 		defer close(ch)
 		rs := b.store.RecordScanner()
 		for rs.Next() {
-			if ctx.Err() != nil {
+			select {
+			case <-ctx.Done():
 				return
+			default:
 			}
 			ch <- cid.NewCidV1(cid.Raw, []byte(rs.Key()))
 		}
