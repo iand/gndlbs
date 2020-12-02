@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/iand/gonudb"
 	blocks "github.com/ipfs/go-block-format"
 	"github.com/ipfs/go-cid"
 	"github.com/ipfs/go-ipfs-blockstore"
@@ -68,6 +69,15 @@ func TestPutThenGetBlock(t *testing.T) {
 	fetched, err := bs.Get(orig.Cid())
 	require.NoError(t, err)
 	require.Equal(t, orig.RawData(), fetched.RawData())
+}
+
+func TestPutEmpty(t *testing.T) {
+	bs, _, _ := newBlockstore(t)
+
+	emptyBlock := blocks.NewBlock([]byte{})
+
+	err := bs.Put(emptyBlock)
+	require.Equal(t, gonudb.ErrDataMissing, err)
 }
 
 func TestHas(t *testing.T) {
