@@ -1,10 +1,10 @@
-# Gonudb-lbs
+# gndlbs
 
-Gonudb-lbs is a [Lotus](https://github.com/filecoin-project/lotus) blockstore implementation using 
+*gndlbs* is a [Lotus](https://github.com/filecoin-project/lotus) blockstore implementation using 
 [Gonudb](https://github.com/iand/gonudb), an append-only key/value datastore written in Go.
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/iand/gonudb-lbs)](https://goreportcard.com/report/github.com/iand/gonudb-lbs)
-[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/iand/gonudb-lbs)
+[![Go Report Card](https://goreportcard.com/badge/github.com/iand/gndlbs)](https://goreportcard.com/report/github.com/iand/gndlbs)
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/iand/gndlbs)
 
 
 

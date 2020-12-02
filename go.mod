@@ -1,4 +1,4 @@
-module github.com/iand/gonudb-lbs
+module github.com/iand/gndlbs
 
 go 1.16
 
