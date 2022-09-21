@@ -3,11 +3,10 @@
 *gonubs* is a [Lotus](https://github.com/filecoin-project/lotus) blockstore implementation using 
 [Gonudb](https://github.com/iand/gonudb), an append-only key/value datastore written in Go.
 
+[![Check Status](https://github.com/iand/gonubs/actions/workflows/check.yml/badge.svg)](https://github.com/iand/gonubs/actions/workflows/check.yml)
+[![Test Status](https://github.com/iand/gonubs/actions/workflows/test.yml/badge.svg)](https://github.com/iand/gonubs/actions/workflows/test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/iand/gonubs)](https://goreportcard.com/report/github.com/iand/gonubs)
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/iand/gonubs)
-
-
-
 
 
 ## Author
