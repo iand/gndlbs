@@ -1,10 +1,10 @@
-package gndlbs
+package gonubs
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -45,7 +45,7 @@ func Open(directory string, name string, opts *gonudb.StoreOptions) (*Blockstore
 
 	s, err := gonudb.OpenStore(datPath, keyPath, logPath, opts)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to open store: %w", err)
+		return nil, fmt.Errorf("failed to open store: %w", err)
 	}
 
 	return &Blockstore{store: s}, nil
@@ -75,7 +75,7 @@ func (b *Blockstore) Get(cid cid.Cid) (blocks.Block, error) {
 		return nil, err
 	}
 
-	val, err := ioutil.ReadAll(r)
+	val, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,6 @@ func (b *Blockstore) AllKeysChan(ctx context.Context) (<-chan cid.Cid, error) {
 			ch <- cid.NewCidV1(cid.Raw, []byte(rs.Key()))
 		}
 		// normally would check rs.Err here
-		return
 	}()
 
 	return ch, nil

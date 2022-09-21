@@ -1,9 +1,8 @@
-package gndlbs
+package gonubs
 
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -22,7 +21,7 @@ import (
 func newBlockstore(tb testing.TB) (*Blockstore, string, string) {
 	tb.Helper()
 
-	tmp, err := ioutil.TempFile("", "")
+	tmp, err := os.CreateTemp("", "")
 	if err != nil {
 		tb.Fatalf("unexpected error finding temp file: %v", err)
 	}

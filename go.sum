@@ -19,6 +19,8 @@ github.com/hashicorp/golang-lru v0.5.4 h1:YDjusn29QI/Das2iO9M0BHnIbxPeyuCHsjMW+l
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
 github.com/iand/gonudb v0.2.2 h1:CugqJ2XE2Ewi9UisdxY+0lKfl6w3psu+zVm3IwkKU40=
 github.com/iand/gonudb v0.2.2/go.mod h1:bWj5rN7NDrpdS7Lqj7t7NYXOZGoXQTwSpgGg68t0hcc=
+github.com/iand/gonudb v0.2.3-0.20220921164327-6e69c8d7a518 h1:E18k+FJjU8W8YO88mmP5rB1g/M9io39Bx3VguEQfAj4=
+github.com/iand/gonudb v0.2.3-0.20220921164327-6e69c8d7a518/go.mod h1:h+zzJ+fmDLV+IW6Obf0O9OxvpV5Z0yKeLC4Q3lu74Dc=
 github.com/iand/logfmtr v0.1.4/go.mod h1:5syjcF+yeARZoDxu7YZEbJppinl/HavvhRLelY1Hh+s=
 github.com/ipfs/bbloom v0.0.4 h1:Gi+8EGJ2y5qiD5FbsbpX/TMNcJw8gSqr7eyjHa4Fhvs=
 github.com/ipfs/bbloom v0.0.4/go.mod h1:cS9YprKXpoZ9lT0n/Mw/a6/aFV6DTjTLYHeA+gyqMG0=
