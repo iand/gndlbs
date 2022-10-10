@@ -12,6 +12,7 @@ import (
 	blocks "github.com/ipfs/go-block-format"
 	"github.com/ipfs/go-cid"
 	blockstore "github.com/ipfs/go-ipfs-blockstore"
+	ipld "github.com/ipfs/go-ipld-format"
 )
 
 const (
@@ -55,7 +56,7 @@ func (b *Blockstore) Close() error {
 	return b.store.Close()
 }
 
-func (b *Blockstore) Has(cid cid.Cid) (bool, error) {
+func (b *Blockstore) Has(ctx context.Context, cid cid.Cid) (bool, error) {
 	_, err := b.store.FetchReader(string(cid.Hash()))
 	if err == nil {
 		return true, nil
@@ -66,11 +67,11 @@ func (b *Blockstore) Has(cid cid.Cid) (bool, error) {
 	return false, err
 }
 
-func (b *Blockstore) Get(cid cid.Cid) (blocks.Block, error) {
+func (b *Blockstore) Get(ctx context.Context, cid cid.Cid) (blocks.Block, error) {
 	r, err := b.store.FetchReader(string(cid.Hash()))
 	if err != nil {
 		if errors.Is(err, gonudb.ErrKeyNotFound) {
-			return nil, blockstore.ErrNotFound
+			return nil, ipld.ErrNotFound{Cid: cid}
 		}
 		return nil, err
 	}
@@ -83,20 +84,20 @@ func (b *Blockstore) Get(cid cid.Cid) (blocks.Block, error) {
 	return blocks.NewBlockWithCid(val, cid)
 }
 
-func (b *Blockstore) GetSize(cid cid.Cid) (int, error) {
+func (b *Blockstore) GetSize(ctx context.Context, cid cid.Cid) (int, error) {
 	size, err := b.store.DataSize(string(cid.Hash()))
 	if errors.Is(err, gonudb.ErrKeyNotFound) {
-		return -1, blockstore.ErrNotFound
+		return -1, ipld.ErrNotFound{Cid: cid}
 	}
 	return int(size), err
 }
 
-func (b *Blockstore) Put(block blocks.Block) error {
+func (b *Blockstore) Put(ctx context.Context, block blocks.Block) error {
 	// Note zero length blocks are not supported, will get gonudb.ErrDataMissing
 	return b.store.Insert(string(block.Cid().Hash()), block.RawData())
 }
 
-func (b *Blockstore) PutMany(blocks []blocks.Block) error {
+func (b *Blockstore) PutMany(ctx context.Context, blocks []blocks.Block) error {
 	for _, block := range blocks {
 		if err := b.store.Insert(string(block.Cid().Hash()), block.RawData()); err != nil {
 			return err
@@ -105,7 +106,7 @@ func (b *Blockstore) PutMany(blocks []blocks.Block) error {
 	return nil
 }
 
-func (b *Blockstore) DeleteBlock(cid cid.Cid) error {
+func (b *Blockstore) DeleteBlock(context.Context, cid.Cid) error {
 	return fmt.Errorf("delete not supported")
 }
 
