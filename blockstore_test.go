@@ -10,8 +10,9 @@ import (
 	"github.com/iand/gonudb"
 	blocks "github.com/ipfs/go-block-format"
 	"github.com/ipfs/go-cid"
-	"github.com/ipfs/go-ipfs-blockstore"
+	blockstore "github.com/ipfs/go-ipfs-blockstore"
 	u "github.com/ipfs/go-ipfs-util"
+	ipld "github.com/ipfs/go-ipld-format"
 
 	"github.com/stretchr/testify/require"
 )
@@ -45,16 +46,16 @@ func TestGetWhenKeyNotPresent(t *testing.T) {
 	bs, _, _ := newBlockstore(t)
 
 	c := cid.NewCidV0(u.Hash([]byte("stuff")))
-	bl, err := bs.Get(c)
+	bl, err := bs.Get(context.Background(), c)
 	require.Nil(t, bl)
-	require.Equal(t, blockstore.ErrNotFound, err)
+	require.True(t, ipld.IsNotFound(err))
 }
 
 func TestGetWhenKeyIsNil(t *testing.T) {
 	bs, _, _ := newBlockstore(t)
 
-	_, err := bs.Get(cid.Undef)
-	require.Equal(t, blockstore.ErrNotFound, err)
+	_, err := bs.Get(context.Background(), cid.Undef)
+	require.True(t, ipld.IsNotFound(err))
 }
 
 func TestPutThenGetBlock(t *testing.T) {
@@ -62,10 +63,10 @@ func TestPutThenGetBlock(t *testing.T) {
 
 	orig := blocks.NewBlock([]byte("some data"))
 
-	err := bs.Put(orig)
+	err := bs.Put(context.Background(), orig)
 	require.NoError(t, err)
 
-	fetched, err := bs.Get(orig.Cid())
+	fetched, err := bs.Get(context.Background(), orig.Cid())
 	require.NoError(t, err)
 	require.Equal(t, orig.RawData(), fetched.RawData())
 }
@@ -75,7 +76,7 @@ func TestPutEmpty(t *testing.T) {
 
 	emptyBlock := blocks.NewBlock([]byte{})
 
-	err := bs.Put(emptyBlock)
+	err := bs.Put(context.Background(), emptyBlock)
 	require.Equal(t, gonudb.ErrDataMissing, err)
 }
 
@@ -84,14 +85,14 @@ func TestHas(t *testing.T) {
 
 	orig := blocks.NewBlock([]byte("some data"))
 
-	err := bs.Put(orig)
+	err := bs.Put(context.Background(), orig)
 	require.NoError(t, err)
 
-	ok, err := bs.Has(orig.Cid())
+	ok, err := bs.Has(context.Background(), orig.Cid())
 	require.NoError(t, err)
 	require.True(t, ok)
 
-	ok, err = bs.Has(blocks.NewBlock([]byte("another thing")).Cid())
+	ok, err = bs.Has(context.Background(), blocks.NewBlock([]byte("another thing")).Cid())
 	require.NoError(t, err)
 	require.False(t, ok)
 }
@@ -101,10 +102,10 @@ func TestCidv0v1(t *testing.T) {
 
 	orig := blocks.NewBlock([]byte("some data"))
 
-	err := bs.Put(orig)
+	err := bs.Put(context.Background(), orig)
 	require.NoError(t, err)
 
-	fetched, err := bs.Get(cid.NewCidV1(cid.DagProtobuf, orig.Cid().Hash()))
+	fetched, err := bs.Get(context.Background(), cid.NewCidV1(cid.DagProtobuf, orig.Cid().Hash()))
 	require.NoError(t, err)
 	require.Equal(t, orig.RawData(), fetched.RawData())
 }
@@ -115,15 +116,15 @@ func TestPutThenGetSizeBlock(t *testing.T) {
 	block := blocks.NewBlock([]byte("some data"))
 	missingBlock := blocks.NewBlock([]byte("missingBlock"))
 
-	err := bs.Put(block)
+	err := bs.Put(context.Background(), block)
 	require.NoError(t, err)
 
-	blockSize, err := bs.GetSize(block.Cid())
+	blockSize, err := bs.GetSize(context.Background(), block.Cid())
 	require.NoError(t, err)
 	require.Len(t, block.RawData(), blockSize)
 
-	missingSize, err := bs.GetSize(missingBlock.Cid())
-	require.Equal(t, blockstore.ErrNotFound, err)
+	missingSize, err := bs.GetSize(context.Background(), missingBlock.Cid())
+	require.True(t, ipld.IsNotFound(err))
 	require.Equal(t, -1, missingSize)
 }
 
@@ -175,7 +176,7 @@ func TestReopenPutGet(t *testing.T) {
 	bs, path, base := newBlockstore(t)
 
 	orig := blocks.NewBlock([]byte("some data"))
-	err := bs.Put(orig)
+	err := bs.Put(context.Background(), orig)
 	require.NoError(t, err)
 
 	err = bs.Close()
@@ -185,7 +186,7 @@ func TestReopenPutGet(t *testing.T) {
 	require.NoError(t, err)
 	defer bs.Close()
 
-	fetched, err := bs.Get(orig.Cid())
+	fetched, err := bs.Get(context.Background(), orig.Cid())
 	require.NoError(t, err)
 	require.Equal(t, orig.RawData(), fetched.RawData())
 }
@@ -198,15 +199,15 @@ func TestPutMany(t *testing.T) {
 		blocks.NewBlock([]byte("foo2")),
 		blocks.NewBlock([]byte("foo3")),
 	}
-	err := bs.PutMany(blks)
+	err := bs.PutMany(context.Background(), blks)
 	require.NoError(t, err)
 
 	for _, blk := range blks {
-		fetched, err := bs.Get(blk.Cid())
+		fetched, err := bs.Get(context.Background(), blk.Cid())
 		require.NoError(t, err)
 		require.Equal(t, blk.RawData(), fetched.RawData())
 
-		ok, err := bs.Has(blk.Cid())
+		ok, err := bs.Has(context.Background(), blk.Cid())
 		require.NoError(t, err)
 		require.True(t, ok)
 	}
@@ -222,7 +223,7 @@ func insertBlocks(t *testing.T, bs blockstore.Blockstore, count int) []cid.Cid {
 	keys := make([]cid.Cid, count)
 	for i := 0; i < count; i++ {
 		block := blocks.NewBlock([]byte(fmt.Sprintf("some data %d", i)))
-		err := bs.Put(block)
+		err := bs.Put(context.Background(), block)
 		require.NoError(t, err)
 		// NewBlock assigns a CIDv0; we convert it to CIDv1 because that's what
 		// the store returns.
