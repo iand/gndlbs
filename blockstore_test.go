@@ -161,8 +161,11 @@ func TestAllKeysRespectsContext(t *testing.T) {
 
 	cancel()
 
+	// Next read after cancel may succeed due to timing
+	<-ch
+
+	// Next read must be from a closed channel
 	v, ok = <-ch
-	require.Equal(t, cid.Undef, v)
 	require.False(t, ok)
 }
 
