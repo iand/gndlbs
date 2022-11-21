@@ -165,7 +165,7 @@ func TestAllKeysRespectsContext(t *testing.T) {
 	<-ch
 
 	// Next read must be from a closed channel
-	v, ok = <-ch
+	_, ok = <-ch
 	require.False(t, ok)
 }
 
