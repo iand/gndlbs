@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/iand/gonudb"
+	"github.com/ipfs/boxo/blockstore"
+	"github.com/ipfs/boxo/util"
 	blocks "github.com/ipfs/go-block-format"
 	"github.com/ipfs/go-cid"
-	blockstore "github.com/ipfs/go-ipfs-blockstore"
-	u "github.com/ipfs/go-ipfs-util"
 	ipld "github.com/ipfs/go-ipld-format"
 
 	"github.com/stretchr/testify/require"
@@ -45,7 +45,7 @@ func newBlockstore(tb testing.TB) (*Blockstore, string, string) {
 func TestGetWhenKeyNotPresent(t *testing.T) {
 	bs, _, _ := newBlockstore(t)
 
-	c := cid.NewCidV0(u.Hash([]byte("stuff")))
+	c := cid.NewCidV0(util.Hash([]byte("stuff")))
 	bl, err := bs.Get(context.Background(), c)
 	require.Nil(t, bl)
 	require.True(t, ipld.IsNotFound(err))
