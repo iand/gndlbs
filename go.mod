@@ -3,7 +3,7 @@ module github.com/iand/gonubs
 go 1.18
 
 require (
-	github.com/iand/gonudb v0.4.1
+	github.com/iand/gonudb v0.4.2
 	github.com/ipfs/boxo v0.10.1
 	github.com/ipfs/go-block-format v0.1.2
 	github.com/ipfs/go-cid v0.4.1
